@@ -43,20 +43,50 @@ router.post('/add',validate.validator(),
     responseData.responseReturn(res, 200, true, newProduct);
   }
 });
-router.put('/edit/:id', async function (req, res, next) {
+// router.put('/edit/:id', async function (req, res, next) {
+//   try {
+//     var product = await modelProduct.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
+//     responseData.responseReturn(res, 200, true, product);
+//   } catch (error) {
+//     responseData.responseReturn(res, 404, false, "khong tim thay san pham");
+//   }
+// });
+router.put('/edit/:id', validate.validator(), async function (req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    responseData.responseReturn(res, 400, false, errors.array().map(error => error.msg));
+    return;
+  }
+
   try {
-    var product = await modelProduct.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
-    responseData.responseReturn(res, 200, true, product);
+    const updatedProduct = await modelProduct.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after' });
+    if (!updatedProduct) {
+      responseData.responseReturn(res, 404, false, "Product not found");
+      return;
+    }
+    responseData.responseReturn(res, 200, true, updatedProduct);
   } catch (error) {
-    responseData.responseReturn(res, 404, false, "khong tim thay san pham");
+    responseData.responseReturn(res, 500, false, "Error updating product");
   }
 });
-router.delete('/delete/:id', function (req, res, next) {//delete by Id
+// router.delete('/delete/:id', function (req, res, next) {//delete by Id
+//   try {
+//     var product = modelProduct.findByIdAndDelete(req.params.id);
+//     responseData.responseReturn(res, 200, true, "xoa thanh cong san pham");
+//   } catch (error) {
+//     responseData.responseReturn(res, 404, false, "khong tim thay san pham");
+//   }
+// });
+router.delete('/delete/:id', async function (req, res, next) {
   try {
-    var product = modelProduct.findByIdAndDelete(req.params.id);
-    responseData.responseReturn(res, 200, true, "xoa thanh cong san pham");
+    const product = await modelProduct.findByIdAndDelete(req.params.id);
+    if (!product) {
+      responseData.responseReturn(res, 404, false, "Product not found");
+      return;
+    }
+    responseData.responseReturn(res, 200, true, "Product deleted successfully");
   } catch (error) {
-    responseData.responseReturn(res, 404, false, "khong tim thay san pham");
+    responseData.responseReturn(res, 500, false, "Error deleting product");
   }
 });
 
