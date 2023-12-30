@@ -88,7 +88,7 @@ var responseData = require('../helper/responseData');
 var modelUser = require('../models/user')
 var validate = require('../validates/user')
 const {validationResult} = require('express-validator');
-
+const bcrypt = require('bcrypt');
 
 
 
@@ -116,10 +116,14 @@ router.post('/add',validate.validator(),
   if (user) {
     responseData.responseReturn(res, 404, false, "user da ton tai");
   } else {
+    const salt = bcrypt.genSaltSync(10);
+    const newPassword = bcrypt.hashSync(req.body.password, salt);
     const newUser = await modelUser.createUser({
+      
       userName: req.body.userName,
       email: req.body.email,
-      password: req.body.password
+      password: newPassword,
+      role:req.body.role
     })
     responseData.responseReturn(res, 200, true, newUser);
   }
