@@ -87,7 +87,7 @@ router.post('/forgetPassword', async function(req, res, next){
   console.log(req.body.email);
   var user = await modelUser.getByEmail(email);
   if(!user){
-    res.send("Khong tim thay user");
+    responseData.responseReturn(res, 400, true,'Khong tim thay user');
   }
   else
   {
@@ -112,7 +112,7 @@ router.post('/resetPassword/:token', async function(req, res, next){
    var user = await modelUser.getByTokenForgot(token);
    if(!user)
    {
-    res.send("Khong tim thay user");
+    responseData.responseReturn(res, 400, true,'Khong tim thay user');
    }
    user.password = password;
    user.tokenForgot = undefined;
