@@ -1,5 +1,5 @@
 var jwt = require('jsonwebtoken');
-const configs = require('../helper/config.js')
+const configs = require('../helper/configs.js');
 
 function verifyToken(token) {
     try {

@@ -1,28 +1,40 @@
 var mongoose = require("mongoose");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const configs = require('../helper/config.js')
+const crypto = require('crypto');
+const configs = require('../helper/configs')
 
 const schema = new mongoose.Schema({
-    email:String,
+    email: String,
     userName: String,
     password: String,
-    roles:{
-        type: String,
-        enum: ['admin','user','publisher'],
-        default: 'admin'
-    }
+    role: String,
+    tokenForgot:String,
+    tokenForgotExp:String
 });
-schema.pre('save',function() {
+
+schema.pre('save', function (next) {
+    if(!this.isModified("password")){
+        return next();
+    }
     const salt = bcrypt.genSaltSync(10);
     this.password = bcrypt.hashSync(this.password, salt);
-    
-});
+    next();
+})
+
 schema.methods.getJWT = function () {
     var token = jwt.sign({ id: this._id }, configs.SECRET_KEY,
         { expiresIn: configs.EXP });
     return token;
 }
+
+schema.methods.addTokenForgotPassword= function(){
+    var tokenForgot = crypto.randomBytes(31).toString('hex');
+    this.tokenForgot = tokenForgot;
+    this.tokenForgotExp = Date.now()+15*60*1000;
+    return tokenForgot;
+}
+
 schema.statics.checkLogin = async function (userName, password) {
     if (!userName || !password) {
         return { err: 'Hay nhap day du username va password' };
@@ -38,5 +50,6 @@ schema.statics.checkLogin = async function (userName, password) {
     console.log(user);
     return user;
 }
-module.exports = mongoose.model('user', schema);;
+//JWT
 
+module.exports = mongoose.model('user', schema);;
