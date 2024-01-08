@@ -69,8 +69,10 @@ var mongoose = require('mongoose');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var categoryRouter = require('./routes/category');
 var itemsRouter = require('./routes/items');
 var authenRouter = require('./routes/authen');
+var productRouter = require('./routes/product');
 var app = express();
 
 // view engine setup
@@ -87,6 +89,8 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/items',itemsRouter);
 app.use('/authen',authenRouter);
+app.use('/category',categoryRouter);
+app.use('/product',productRouter);
 mongoose.connect("mongodb://127.0.0.1:27017/local");
 mongoose.connection.once('open', function(){
   console.log("thanh cong");
